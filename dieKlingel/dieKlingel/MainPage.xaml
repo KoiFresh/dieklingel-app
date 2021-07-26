@@ -1,0 +1,167 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:dieKlingel"
+             x:Class="dieKlingel.MainPage"
+             Title="dieKlingel">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem 
+            Text="{Binding RegistrationState}"
+            Order="Primary"
+            Priority="0"
+            x:Name="TbItemState"
+            Clicked="BtnSettings_Clicked">
+        </ToolbarItem>
+    </ContentPage.ToolbarItems>
+
+    <AbsoluteLayout>
+   
+        <ContentView 
+            x:Name="video_frame"
+            BackgroundColor="{AppThemeBinding Light=White,Dark=Black}">
+        </ContentView>
+
+            <!--
+        <StackLayout
+            AbsoluteLayout.LayoutBounds="1,0"
+            AbsoluteLayout.LayoutFlags="PositionProportional">
+        </StackLayout>
+        -->
+
+        <AbsoluteLayout
+            x:Name="lock_"
+            AbsoluteLayout.LayoutFlags="All"
+            AbsoluteLayout.LayoutBounds="1,1,1,1"
+            Opacity="0"
+            IsVisible="False">
+            <Image
+            x:Name="lock_top"
+            AbsoluteLayout.LayoutFlags="All"
+            AbsoluteLayout.LayoutBounds="0.5,0.5,0.7,0.7"
+            Source="lock_top.png">
+            </Image>
+            <Image x:Name="lock_bottom"
+            AbsoluteLayout.LayoutFlags="All"
+            AbsoluteLayout.LayoutBounds="0.5,0.4,0.7,0.7"
+            Source="lock_bottom.png">
+            </Image>
+        </AbsoluteLayout>
+
+        <StackLayout 
+            AbsoluteLayout.LayoutBounds="0.5,1,1,1"
+            AbsoluteLayout.LayoutFlags="All">
+            <StackLayout.GestureRecognizers>
+                <TapGestureRecognizer Tapped="BtnHideControls_Clicked"/>
+            </StackLayout.GestureRecognizers>
+            <Frame
+                x:Name="FrBtnSettings"
+                HorizontalOptions="EndAndExpand"
+                VerticalOptions="Start"
+                CornerRadius="20"
+                WidthRequest="40"
+                HeightRequest="40"
+                Padding="0"
+                Margin="7"
+                HasShadow="False"
+                IsClippedToBounds="True">
+                <ImageButton
+                        x:Name="BtnSettings"
+                        BackgroundColor="#969696"
+                        Source="settings.png"
+                        Clicked="BtnSettings_Clicked"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center" >
+                </ImageButton>
+            </Frame>
+
+            <!--  <Frame
+                CornerRadius="20"
+                BorderColor="Gray"
+                IsClippedToBounds="True"
+                HorizontalOptions="EndAndExpand"
+                VerticalOptions="EndAndExpand"
+                Margin="10"
+                Padding="0"
+                HasShadow="False">
+                <ContentView 
+                    x:Name="self_frame"
+                    HorizontalOptions="EndAndExpand"
+                    VerticalOptions="EndAndExpand"
+                    />
+            </Frame> -->
+
+            <FlexLayout
+                x:Name="FlMainControls"
+                Direction="Row"
+                VerticalOptions="EndAndExpand"
+                JustifyContent="SpaceAround"
+                Margin="0, 0, 0, 35"
+                Wrap="NoWrap">
+                <Frame
+                    CornerRadius="30"
+                    WidthRequest="60"
+                    HeightRequest="60"
+                    Padding="0"
+                    IsClippedToBounds="True"
+                    HasShadow="False">
+                    <ImageButton
+                        x:Name="BtnCall"
+                        BackgroundColor="Red"
+                        Source="phone.png"
+                        Clicked="BtnCall_Clicked"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"/>
+                </Frame>
+                <Frame
+                    CornerRadius="30"
+                    WidthRequest="60"
+                    HeightRequest="60"
+                    Padding="0"
+                    IsClippedToBounds="True"
+                    HasShadow="False">
+                    <ImageButton
+                        x:Name="BtnMute"
+                        BackgroundColor="Red"
+                        Source="mic.png"
+                        Clicked="BtnMute_Clicked"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"/>
+                </Frame>
+                <Frame
+                    CornerRadius="30"
+                    WidthRequest="60"
+                    HeightRequest="60"
+                    Padding="0"
+                    IsClippedToBounds="True"
+                    HasShadow="False">
+                    <ImageButton
+                        x:Name="BtnSpeaker"
+                        BackgroundColor="#0d9fbf"
+                        Source="speaker.png"
+                        Clicked="BtnSpeaker_Clicked"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"/>
+                        <!--
+                        Clicked="BtnMute_Clicked"
+                        -->
+                </Frame>
+                <Frame
+                    CornerRadius="30"
+                    WidthRequest="60"
+                    HeightRequest="60"
+                    Padding="0"
+                    IsClippedToBounds="True"
+                    HasShadow="False">
+                    <ImageButton
+                        x:Name="BtnDoorUnlock"
+                        BackgroundColor="#e6c13e"
+                        Source="door.png"
+                        Clicked="BtnDoorUnlock_Clicked"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"/>
+                </Frame>
+            </FlexLayout>
+        </StackLayout>
+    </AbsoluteLayout>
+</ContentPage>

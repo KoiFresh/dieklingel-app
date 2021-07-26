@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="dieKlingel.Pages.Account"
+             Title="Account">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem 
+            Text="&#10004;"
+            Order="Primary"
+            Priority="0"
+            Clicked="BtnSave_Clicked"/>
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Content>
+        <ScrollView>
+            <StackLayout 
+                BackgroundColor="{AppThemeBinding Light=White, Dark=Black}"
+                Padding="15">
+                <Label
+                    Text="Ct Benutzername:"
+                    FontAttributes="Bold"/>
+                <Entry 
+                    x:Name="EntryCtUsername"
+                    Placeholder="Ct Benutzername"
+                    HorizontalOptions="Fill"
+                    Keyboard="Plain"
+                    IsSpellCheckEnabled="False"/>
+                <Label
+                    x:Name="LblCtPassword"
+                    Text="Ct Passwort:"
+                    FontAttributes="Bold"
+                    Margin="0,10,0,0"/>
+                <Entry 
+                    x:Name="EntryCtPassword"
+                    Placeholder="Ct Passwort"
+                    HorizontalOptions="Fill"
+                    Keyboard="Plain"
+                    MaxLength="32"
+                    IsSpellCheckEnabled="False"
+                    TextChanged="EntryCtPassword_TextChanged"
+                    IsPassword="True"/>
+                <Label
+                    Text="Ct Domain:"
+                    FontAttributes="Bold"
+                    Margin="0,10,0,0"/>
+                <Entry
+                    x:Name="EntryCtDomain"
+                    Placeholder="Ct Domain"
+                    HorizontalOptions="FillAndExpand"
+                    Keyboard="Plain"
+                    IsSpellCheckEnabled="False"/>
+                <Button 
+                    x:Name="BtnAccountInfo"
+                    Clicked="BtnAccountInfo_Clicked"
+                    Text="Account Informationen"
+                    IsVisible="false"/>
+            </StackLayout>
+        </ScrollView>
+    </ContentPage.Content>
+</ContentPage>
