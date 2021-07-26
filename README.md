@@ -1,5 +1,5 @@
 # dieklingel-app
-
+![alt text](https://dieklingel.com/images/logo_2500x500_free.png)
 dieKlingel ist ein Projekt unter der Leitung von Kai Mayer und Sven Schoch. Alle Informationen zum Projekt können unter https://dieklingel.com/ entnommen werden.
 
 Hier wird der Quellcode  der App veröffentlicht. Die App wird demnächst in App Store und Im PlayStore verfügbar sein.
