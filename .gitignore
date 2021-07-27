@@ -7,6 +7,7 @@
 *.framework/**
 Frameworks/
 **/Native*References/
+*.DS_Store
 
 # User-specific files
 *.rsuser

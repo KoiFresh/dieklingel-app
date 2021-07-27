@@ -14,7 +14,7 @@ namespace dieKlingel
         {
             get
             {
-                return Preferences.Get("OwnPushToken", "ERROR");
+                return Preferences.Get("OwnPushToken", "ERROR_NO_PUSH_TOKEN_STORED");
             }
             set
             {
