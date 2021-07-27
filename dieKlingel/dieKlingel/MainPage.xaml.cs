@@ -27,6 +27,7 @@ namespace dieKlingel
         public bool MicrophoneIsMuted { get; set; }
         public bool MainControlsHidden { get; set; }
         private bool SpeakerIsEnabled { get; set; }
+        private bool CallIsActive { get; set; }
 
         private bool one_shot = false;
         public MainPage()
@@ -122,6 +123,7 @@ namespace dieKlingel
                 case CallState.Connected:
                     lcall.CameraEnabled = false;
                     //dieKlingel.Audio.Controller.TurnSpeakerOn();
+                    
                     if(SpeakerIsEnabled)
                     {
                         dieKlingel.Audio.Controller.TurnSpeakerOn();
@@ -130,6 +132,7 @@ namespace dieKlingel
                         dieKlingel.Audio.Controller.TurnSpeakerOff();
                     }
                     DeviceDisplay.KeepScreenOn = true;
+                    CallIsActive = true;
 #if __IOS__
                     navBarBackgroundColor = ((NavigationPage)Application.Current.MainPage).BarBackgroundColor;
                     ((NavigationPage)Application.Current.MainPage).BarBackgroundColor = Color.Black;
@@ -139,8 +142,9 @@ namespace dieKlingel
                     break;
                 case CallState.End:
                     DeviceDisplay.KeepScreenOn = false;
+                    CallIsActive = false;
+                    HideMainControls(!MainControlsHidden);
 #if __IOS__
-
                     ((NavigationPage)Application.Current.MainPage).BarBackgroundColor = navBarBackgroundColor;
                     ((NavigationPage)Application.Current.MainPage).BarTextColor = navBarTextColor;
                     UIKit.UIApplication.SharedApplication.StatusBarStyle = UIKit.UIStatusBarStyle.Default;
