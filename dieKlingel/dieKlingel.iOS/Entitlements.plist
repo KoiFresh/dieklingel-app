@@ -5,10 +5,8 @@
 		<key>com.apple.developer.networking.wifi-info</key>
 		<true />
 		<!-- Uncomment for Development -->
-		<!--
 		<key>aps-environment</key>
 		<string>development</string>
-		-->
 
 		<key>com.apple.security.application-groups</key>
 		<array>

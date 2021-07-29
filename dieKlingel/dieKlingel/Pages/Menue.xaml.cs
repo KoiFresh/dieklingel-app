@@ -28,6 +28,15 @@ namespace dieKlingel.Pages
             });
             MenueItems.Add(new MenueListTemplate
             {
+                Text = "Verbinden",
+                Clicked = () =>
+                {
+                    Navigation.PushAsync(new Pages.Connect());
+                    return 0;
+                }
+            });
+            MenueItems.Add(new MenueListTemplate
+            {
                 Text = "Impressum",
                 Clicked = () =>
                 {

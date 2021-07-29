@@ -57,10 +57,10 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <MtouchArch>ARM64</MtouchArch>
-    <CodesignKey>iPhone Distribution: Kai Mayer (3QLZPMLJ3W)</CodesignKey>
+    <CodesignKey>Apple Development: Kai Mayer (P3KDJ373HF)</CodesignKey>
     <MtouchDebug>true</MtouchDebug>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
-    <CodesignProvision>dieklingel provisioning</CodesignProvision>
+    <CodesignProvision>VS: com.dieklingel.app Development</CodesignProvision>
     <MtouchLink>None</MtouchLink>
     <MtouchInterpreter>-all</MtouchInterpreter>
   </PropertyGroup>
@@ -195,6 +195,15 @@
     <PackageReference Include="RestSharp">
       <Version>106.11.7</Version>
     </PackageReference>
+    <PackageReference Include="SkiaSharp.Views.Forms">
+      <Version>2.80.3</Version>
+    </PackageReference>
+    <PackageReference Include="SSH.NET">
+      <Version>2020.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="Xam.Plugin.Connectivity">
+      <Version>4.0.0.190-beta</Version>
+    </PackageReference>
     <PackageReference Include="Xam.Plugin.DeviceInfo">
       <Version>4.1.1</Version>
     </PackageReference>
@@ -283,6 +292,8 @@
     <BundleResource Include="Resources\lock_top.png" />
     <BundleResource Include="Resources\speaker.png" />
     <BundleResource Include="Resources\speakersilent.png" />
+    <BundleResource Include="Resources\dieklingel.png" />
+    <BundleResource Include="Resources\smartphone.png" />
     <Content Include="short_sound.wav" />
   </ItemGroup>
   <ItemGroup>

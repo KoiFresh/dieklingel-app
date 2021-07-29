@@ -1,0 +1,37 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="dieKlingel.Controls.Finder"
+             xmlns:Skia="clr-namespace:SkiaSharp.Views.Forms;assembly=SkiaSharp.Views.Forms"
+             xmlns:local="clr-namespace:dieKlingel">
+  <ContentView.Content>
+
+        <Grid
+            HorizontalOptions="Center"
+            Margin="0, 40">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <ImageButton
+                x:Name="BtnSmartphone"
+                Grid.Column="0"
+                Source="smartphone.png"
+                WidthRequest="100"
+                HeightRequest="100"
+                Margin="10"
+                BackgroundColor="Transparent"/>
+            <Skia:SKCanvasView
+                Grid.Column="1"
+                x:Name="SkCanvas"/>
+            <ImageButton
+                Grid.Column="2"
+                x:Name="BtnDoorunit"
+                Source="dieklingel.png"
+                WidthRequest="120"
+                HeightRequest="120"
+                BackgroundColor="Transparent"/>
+        </Grid>
+    </ContentView.Content>
+</ContentView>

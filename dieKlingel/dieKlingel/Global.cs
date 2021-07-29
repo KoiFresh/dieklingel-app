@@ -87,6 +87,7 @@ namespace dieKlingel
                 //return ((App)App.Current).Manager.Core;
             }
         }
+
         public static bool IsInForeground { get; set; }
         public static RegistrationState RegistrationState { get; set; }
     } 
