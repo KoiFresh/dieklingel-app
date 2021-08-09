@@ -62,6 +62,16 @@ namespace dieKlingel
             return plaintext;
         }
 
+        public static string Normalize(string text, int length = 32)
+        {
+            string result = text;
+            while(result.Length < length)
+            {
+                result += text;
+            }
+            return result.Substring(0, length);
+        }
+
         public static string RandomIV(int length)
         {
             Random random = new Random();

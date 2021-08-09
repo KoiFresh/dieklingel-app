@@ -31,11 +31,6 @@ namespace dieKlingel.Pages
 
         private async void BtnSave_Clicked(object sender, EventArgs e)
         {
-            if (EntryCtPassword.Text.Length < 32)
-            {
-                await DisplayAlert("Error", "Dein Passwort muss exakt aus 32 Zeichen bestehen", "Ok");
-                return;
-            }
             if (EntryCtDomain.Text == String.Empty || EntryCtPassword.Text == String.Empty || EntryCtUsername.Text == String.Empty)
             {
                 await DisplayAlert("Error", "Fülle alle Felder aus!", "Ok");
@@ -43,7 +38,7 @@ namespace dieKlingel.Pages
             }
             // einträge abspeichern
             Global.CtDomain = EntryCtDomain.Text;
-            Global.Key = EntryCtPassword.Text;
+            Global.Key = Cryptonia.Normalize(EntryCtPassword.Text);
             Global.CtUsername = EntryCtUsername.Text;
             string iv = Global.Key.Substring(0, 16);
             Global.Registry = Cryptonia.Encrypt(Global.CtUsername, Global.Key, iv);
@@ -150,17 +145,6 @@ namespace dieKlingel.Pages
                 Global.User = new JObject();
                 BtnAccountInfo.IsVisible = false;
                 Socket.SipClear();
-            }
-        }
-
-        private void EntryCtPassword_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            Entry entry = (Entry)sender;
-            int missingchars = 32 - entry.Text.Length;
-            LblCtPassword.Text = "Ct Password:";
-            if (missingchars > 0)
-            {
-                LblCtPassword.Text += " (" + missingchars + "fehlen)";
             }
         }
     }

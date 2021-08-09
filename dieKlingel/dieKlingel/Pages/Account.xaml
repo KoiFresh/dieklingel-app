@@ -38,7 +38,6 @@
                     Keyboard="Plain"
                     MaxLength="32"
                     IsSpellCheckEnabled="False"
-                    TextChanged="EntryCtPassword_TextChanged"
                     IsPassword="True"/>
                 <Label
                     Text="Ct Domain:"
