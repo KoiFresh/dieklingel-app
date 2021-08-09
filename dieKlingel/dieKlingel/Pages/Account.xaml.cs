@@ -38,10 +38,10 @@ namespace dieKlingel.Pages
             }
             // einträge abspeichern
             Global.CtDomain = EntryCtDomain.Text;
-            Global.Key = Cryptonia.Normalize(EntryCtPassword.Text);
+            Global.Key = EntryCtPassword.Text;
             Global.CtUsername = EntryCtUsername.Text;
-            string iv = Global.Key.Substring(0, 16);
-            Global.Registry = Cryptonia.Encrypt(Global.CtUsername, Global.Key, iv);
+            string iv = Cryptonia.Normalize(Global.Key).Substring(0, 16);
+            Global.Registry = Cryptonia.Encrypt(Global.CtUsername, Cryptonia.Normalize(Global.Key), iv);
             // senden
             JObject res = Socket.Send(Socket.Context.Register, new JObject());
             Debug.WriteLine(JsonConvert.SerializeObject(res));

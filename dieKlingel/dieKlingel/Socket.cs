@@ -71,7 +71,7 @@ namespace dieKlingel
             obj["body"]["context"] = ContextAsString(context);
             // Encrypt object
             string iv = Cryptonia.RandomIV(16);
-            string crypted = iv + Cryptonia.Encrypt(JsonConvert.SerializeObject(obj), Global.Key, iv);
+            string crypted = iv + Cryptonia.Encrypt(JsonConvert.SerializeObject(obj), Cryptonia.Normalize(Global.Key), iv);
             // Send to Server
             try
             {
@@ -86,7 +86,7 @@ namespace dieKlingel
                 {
                     string text = response.Content.Substring(16);
                     iv = response.Content.Substring(0, 16);
-                    string plainres = Cryptonia.Decrypt(text, Global.Key, iv);
+                    string plainres = Cryptonia.Decrypt(text, Cryptonia.Normalize(Global.Key), iv);
                     result = JObject.Parse(plainres);
                 }
                 result["status_code"] = (int)response.StatusCode;
