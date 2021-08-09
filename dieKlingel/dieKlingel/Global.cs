@@ -14,7 +14,7 @@ namespace dieKlingel
         {
             get
             {
-                return Preferences.Get("OwnPushToken", "ERROR");
+                return Preferences.Get("OwnPushToken", "ERROR_NO_PUSH_TOKEN_STORED");
             }
             set
             {
@@ -87,6 +87,7 @@ namespace dieKlingel
                 //return ((App)App.Current).Manager.Core;
             }
         }
+
         public static bool IsInForeground { get; set; }
         public static RegistrationState RegistrationState { get; set; }
     } 

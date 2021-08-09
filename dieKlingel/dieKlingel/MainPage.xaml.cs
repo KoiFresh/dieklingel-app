@@ -143,7 +143,7 @@ namespace dieKlingel
                 case CallState.End:
                     DeviceDisplay.KeepScreenOn = false;
                     CallIsActive = false;
-                    HideMainControls(!MainControlsHidden);
+                    HideMainControls(false);
 #if __IOS__
                     ((NavigationPage)Application.Current.MainPage).BarBackgroundColor = navBarBackgroundColor;
                     ((NavigationPage)Application.Current.MainPage).BarTextColor = navBarTextColor;
@@ -243,7 +243,7 @@ namespace dieKlingel
                     await lock_top.TranslateTo(0, -30, 200);
               
                     await lock_.FadeTo(0, 300);
-                    lock_top.TranslateTo(0, 0, 0);
+                    _ = lock_top.TranslateTo(0, 0, 0);
                     lock_.IsVisible = false;
                 }
             }
@@ -256,7 +256,10 @@ namespace dieKlingel
 
         private void BtnHideControls_Clicked(object sender, EventArgs e)
         {
-            HideMainControls(!MainControlsHidden);
+            if(CallIsActive)
+            {
+                HideMainControls(!MainControlsHidden);
+            }
         }
 
         private async void HideMainControls(bool hide=true)
@@ -266,11 +269,11 @@ namespace dieKlingel
             MainControlsHidden = hide;
             if (hide)
             {
-                FrBtnSettings.TranslateTo(100, 0, 200);
+                _ = FrBtnSettings.TranslateTo(100, 0, 200);
                 await FlMainControls.TranslateTo(0, 200, 200);
             }else
             {
-                FrBtnSettings.TranslateTo(0, 0, 200);
+                _ = FrBtnSettings.TranslateTo(0, 0, 200);
                 await FlMainControls.TranslateTo(0, 0, 200);
             }
             
