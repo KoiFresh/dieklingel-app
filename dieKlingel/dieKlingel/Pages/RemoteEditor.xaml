@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="dieKlingel.Pages.RemoteEditor"
+             xmlns:editor ="clr-namespace:dieKlingel.Controls.Editor"
+             Title="Remote Editor">
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem 
+            Text="&#128190;"
+            Order="Primary"
+            Priority="1"
+            Clicked="BtnSave_Clicked"/>
+        <ToolbarItem 
+            Text="	&#10133;"
+            Order="Primary"
+            Priority="0"
+            Clicked="BtnAdd_Clicked"/>
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Content>
+        <StackLayout
+            x:Name="stack_layout">
+            <Picker 
+                x:Name="PckrFile" 
+                SelectedIndexChanged="PckrFile_SelectedIndexChanged"
+                Margin="15, 15, 15, 10"
+                Title="Datei:">
+            </Picker>
+            <!-- <Editor 
+                x:Name="EdtrFile" 
+                VerticalOptions="FillAndExpand"
+                HorizontalOptions="Fill"
+                IsSpellCheckEnabled="False"
+                BackgroundColor="#f0f0f0"
+                TextChanged="EdtrFile_TextChanged">
+
+            </Editor> -->
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

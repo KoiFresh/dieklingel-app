@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="com.dieklingel.app" android:installLocation="internalOnly">
-	<uses-sdk android:minSdkVersion="28" android:targetSdkVersion="28" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="2" android:versionName="1.4" package="com.dieklingel.app" android:installLocation="auto">
+	<uses-sdk android:minSdkVersion="27" android:targetSdkVersion="28" />
 	<uses-permission android:name="android.permission.USE_SIP" />
 	<uses-permission android:name="android.permission.CALL_PHONE" />
 	<uses-permission android:name="android.permission.CONFIGURE_SIP" />
@@ -26,7 +26,7 @@
 	<uses-feature android:name="android.hardware.wifi" android:required="true" />
 	<uses-feature android:name="android.hardware.microphone" android:required="true" />
 	<uses-feature android:name="android.hardware.telephony" android:required="true" />
-	<application android:label="dieKlingel.Android" android:icon="@drawable/icon">
+	<application android:label="dieKlingel" android:icon="@drawable/icon" android:extractNativeLibs="true">
 		<receiver android:name="com.google.firebase.iid.FirebaseInstanceIdInternalReceiver" android:exported="false" />
 		<receiver android:name="com.google.firebase.iid.FirebaseInstanceIdReceiver" android:exported="true" android:permission="com.google.android.c2dm.permission.SEND">
 			<intent-filter>

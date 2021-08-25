@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="dieKlingel.Controls.Editor.Plain">
+    <ContentView.Content>
+        <ScrollView
+            Orientation="Horizontal"
+            VerticalOptions="Fill"
+            HorizontalOptions="FillAndExpand">
+            <Editor x:Name="editor"
+                    FontFamily="Courier New"
+                    VerticalOptions="FillAndExpand"
+                    HorizontalOptions="FillAndExpand"
+                    BackgroundColor="#f2f2f2">
+            </Editor>
+        </ScrollView>
+    </ContentView.Content>
+</ContentView>

@@ -62,6 +62,15 @@ namespace dieKlingel.Pages
                     return 0;
                 }
             });
+            MenueItems.Add(new MenueListTemplate
+            {
+                Text = "About",
+                Clicked = () =>
+                {
+                    Navigation.PushAsync(new Pages.About());
+                    return 0;
+                }
+            });
             ListMenue.ItemsSource = MenueItems;
             BindingContext = this;
         }

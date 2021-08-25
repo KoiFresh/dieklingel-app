@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define LINPHONE_LOG // to enable SIP Log in LinphoneManager.cs line 84
+
+using System;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 

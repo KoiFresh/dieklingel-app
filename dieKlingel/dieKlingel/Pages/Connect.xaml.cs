@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using System.Net.NetworkInformation;
-using Plugin.Connectivity;
 using System.IO;
 using System.Net;
 using Xamarin.Essentials;
@@ -45,7 +44,7 @@ namespace dieKlingel.Pages
             isSearching = false;
         }
 
-        private async void SearchForDevices(string hostname)
+        private void SearchForDevices(string hostname)
         {
             devices.Clear();
             try
@@ -97,7 +96,7 @@ namespace dieKlingel.Pages
                 }
                 else
                 {
-                    await DisplayAlert("Offline", "Es wurde kein Gerät in deiner Nähe gefunden", "Ok");
+                    await DisplayAlert("Offline", "Es wurde keine Klingel in deiner Nähe gefunden", "Ok");
                 }
             });
             isSearching = false;
@@ -122,21 +121,53 @@ namespace dieKlingel.Pages
 
         private async void Finder_SecondIconClicked(object sender, EventArgs e)
         {
-            if(devices.Count > 1)
+
+            IPAddress ipaddress = null;
+            if (devices.Count > 1)
             {
                 List<string> devs = new List<string>();
-                foreach(IPAddress device in devices)
+                foreach (IPAddress device in devices)
                 {
                     devs.Add(device.ToString());
                 }
                 //Finder.StopSearching();
-                await DisplayActionSheet("Klingel", "Abbrechen", null ,devs.ToArray());
-            } else
-            {
-                await DisplayAlert("", devices[0].ToString(), "Ok");
+                string result = await DisplayActionSheet("Klingel", "Abbrechen", null, devs.ToArray());
+                if(result != "Abbrechen")
+                {
+                    ipaddress = IPAddress.Parse(result);
+                }
             }
-     
+            else
+            {
+                ipaddress = IPAddress.Parse(devices[0].ToString());
+                //await DisplayAlert("", devices[0].ToString(), "Ok");
+            }
+            if(ipaddress != null)
+            {
+                CheckLogin(ipaddress, "Gib deine Lokalen Login Informationen ein");
+            }
         }
 
+        private async void CheckLogin(IPAddress ipaddress, string message)
+        {
+            LoginResult loginResult = await UserDialogs.Instance.LoginAsync("Verbinden", message, null);
+            if (loginResult.Ok && !string.IsNullOrEmpty(loginResult.LoginText) && !string.IsNullOrEmpty(loginResult.Password))
+            {
+                using (SshClient sshClient = new SshClient(ipaddress.ToString(), 22, loginResult.LoginText, loginResult.Password))
+                {
+                    try
+                    {
+                        sshClient.Connect();
+                        sshClient.Disconnect();
+                        await Navigation.PushAsync(new Pages.RemoteEditor(loginResult.LoginText, loginResult.Password, ipaddress, 22));
+                    }
+                    catch (Exception e)
+                    {
+                        //await DisplayAlert("Error", "Der Benutzername oder das Password ist nicht korrekt", "Erneut versuchen", "Abbrechen");
+                        CheckLogin(ipaddress, "Der Benutzername oder das Password ist nicht korrekt");
+                    }
+                }
+            }
+        }
     }
 }

@@ -129,7 +129,7 @@ namespace dieKlingel.Droid
                         }
                     }
                 }
-            }
+            } 
             LoadApplication(app);
         }
 

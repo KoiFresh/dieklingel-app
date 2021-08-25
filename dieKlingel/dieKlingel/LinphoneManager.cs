@@ -81,7 +81,9 @@ namespace dieKlingel
                     break;
             }
             log += "] (" + domain + ") " + message;
+#if LINPHONE_LOG
             Debug.WriteLine(log);
+#endif
         }
 
         private void OnGlobal(Core lc, GlobalState gstate, string message)
