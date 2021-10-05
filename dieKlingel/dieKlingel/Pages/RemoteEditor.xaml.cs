@@ -113,61 +113,75 @@ namespace dieKlingel.Pages
             }
         }
 
-        private async void PckrFile_SelectedIndexChanged(object sender, EventArgs e)
+        private void BtnReload_Clicked(object sender, EventArgs e)
         {
             if (PckrFile.SelectedIndex >= 0)
             {
-                using (SftpClient sftpClient = new SftpClient(ipaddress.ToString(), port, username, password))
-                {
-                    sftpClient.Connect();
-                    using (MemoryStream fileStream = new MemoryStream())
-                    {
-                        try
-                        {
-                            sftpClient.DownloadFile(Path.Combine(BASEPATH, files[PckrFile.SelectedItem.ToString()]), fileStream);
-                            string extension = files[PckrFile.SelectedItem.ToString()].Split(".").Last().ToLower();
-                            StackLayout stackLayout = this.FindByName<StackLayout>("stack_layout");
-                            stackLayout.Children.Remove(editor);
-                            switch (extension)
-                            {
-                                case "ini":
-                                    editor = new Controls.Editor.Ini();
-                                    break;
-                                case "json":
-                                    editor = new Controls.Editor.Json();
-                                    break;
-                                case "cmd":
-                                    editor = new Controls.Editor.Cmd();
-                                    break;
-                                default:
-                                    editor = new Controls.Editor.Plain();
-                                    break;
-                            }
-                            //editor.Margin = 10;
-                            ((Controls.Editor.IBase)editor).Text = Encoding.ASCII.GetString(fileStream.ToArray());
-                            editor.VerticalOptions = LayoutOptions.FillAndExpand;
-                            ((Controls.Editor.IBase)editor).CustomCommand += RemoteEditor_CustomCommand;
-                            //EdtrFile.Text = Encoding.ASCII.GetString(fileStream.ToArray());
-                            stackLayout.Children.Add(editor);
-                            lastSelectedFile = PckrFile.SelectedIndex;
-                        }
-                        catch (Exception ex)
-                        {
+                LoadFile(files[PckrFile.SelectedItem.ToString()]);
+            }
+        }
 
-                            Console.WriteLine("Error on sftp:" + ex.Message);
-                            await DisplayAlert("Error", "Die gewählte Datei wird nicht Unterstützt!", "Ok");
-                            PckrFile.SelectedIndex = lastSelectedFile;
-
-                        }
-                    }
-                    sftpClient.Disconnect();
-                }
+        private void PckrFile_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (PckrFile.SelectedIndex >= 0)
+            {
+                LoadFile(files[PckrFile.SelectedItem.ToString()]);
             }
         }
 
         private void EdtrFile_TextChanged(object sender, TextChangedEventArgs e)
         {
-            Console.WriteLine("Text Changed");
+            System.Diagnostics.Debug.WriteLine("Text Changed");
+        }
+
+        private async void LoadFile(string filename)
+        {
+            using (SftpClient sftpClient = new SftpClient(ipaddress.ToString(), port, username, password))
+            {
+                sftpClient.Connect();
+                using (MemoryStream fileStream = new MemoryStream())
+                {
+                    try
+                    {
+                        sftpClient.DownloadFile(Path.Combine(BASEPATH, filename), fileStream);
+                        string extension = files[PckrFile.SelectedItem.ToString()].Split(".").Last().ToLower();
+                        StackLayout stackLayout = this.FindByName<StackLayout>("stack_layout");
+                        stackLayout.Children.Remove(editor);
+                        switch (extension)
+                        {
+                            case "ini":
+                                editor = new Controls.Editor.Ini();
+                                break;
+                            case "json":
+                                editor = new Controls.Editor.Json();
+                                //editor = new Controls.Editor.Plain();
+                                break;
+                            case "cmd":
+                                editor = new Controls.Editor.Cmd();
+                                break;
+                            default:
+                                editor = new Controls.Editor.Plain();
+                                break;
+                        }
+                        //editor.Margin = 10;
+                        ((Controls.Editor.IBase)editor).Text = Encoding.ASCII.GetString(fileStream.ToArray());
+                        editor.VerticalOptions = LayoutOptions.FillAndExpand;
+                        ((Controls.Editor.IBase)editor).CustomCommand += RemoteEditor_CustomCommand;
+                        //EdtrFile.Text = Encoding.ASCII.GetString(fileStream.ToArray());
+                        stackLayout.Children.Add(editor);
+                        lastSelectedFile = PckrFile.SelectedIndex;
+                    }
+                    catch (Exception ex)
+                    {
+
+                        Console.WriteLine("Error on sftp:" + ex.Message);
+                        await DisplayAlert("Error", "Die gewählte Datei wird nicht Unterstützt!", "Ok");
+                        PckrFile.SelectedIndex = lastSelectedFile;
+
+                    }
+                }
+                sftpClient.Disconnect();
+            }
         }
 
         private static MemoryStream GenerateStreamFromString(string s)

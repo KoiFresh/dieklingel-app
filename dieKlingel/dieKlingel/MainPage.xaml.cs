@@ -55,8 +55,8 @@ namespace dieKlingel
 #endif
                 obj["body"]["data"]["sound"] = "normal_sound";
                 Socket.Send(Socket.Context.DeviceUpdate, obj);
-                MessagingCenter.Subscribe<object, string>(this, "Pushaction", Pushaction);
             }
+            MessagingCenter.Subscribe<object, string>(this, "Pushaction", Pushaction);
         }
 
         protected override void OnAppearing()

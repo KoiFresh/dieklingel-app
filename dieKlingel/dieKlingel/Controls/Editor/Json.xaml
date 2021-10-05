@@ -2,9 +2,14 @@
 <ContentView xmlns="http://xamarin.com/schemas/2014/forms" 
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="dieKlingel.Controls.Editor.Json">
-  <ContentView.Content>
-      <StackLayout>
-          <Label Text="Json" />
-      </StackLayout>
-  </ContentView.Content>
+    <ContentView.Content>
+        <ScrollView 
+            Orientation="Both">
+            <StackLayout
+                x:Name="stack_layout"
+                Margin="10, 0">
+            </StackLayout>
+        </ScrollView>
+
+    </ContentView.Content>
 </ContentView>

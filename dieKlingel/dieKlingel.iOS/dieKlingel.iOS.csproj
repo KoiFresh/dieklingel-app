@@ -57,7 +57,7 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
     <MtouchArch>ARM64</MtouchArch>
-    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignKey>Apple Development: Kai Mayer (P3KDJ373HF)</CodesignKey>
     <MtouchDebug>true</MtouchDebug>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <CodesignProvision>VS: com.dieklingel.app Development</CodesignProvision>
@@ -297,7 +297,19 @@
     <BundleResource Include="Resources\lock_top.png" />
     <BundleResource Include="Resources\speaker.png" />
     <BundleResource Include="Resources\speakersilent.png" />
+    <BundleResource Include="Resources\arrow_expand_up.png" />
+    <BundleResource Include="Resources\add.png" />
+    <BundleResource Include="Resources\delete.png" />
+    <BundleResource Include="Resources\dieklingel.png" />
+    <BundleResource Include="Resources\smartphone.png" />
     <Content Include="short_sound.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AppResources.de.resx" />
+    <EmbeddedResource Include="AppResources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\dieKlingel.iOS.Extension.Notification\dieKlingel.iOS.Extension.Notification.csproj">
@@ -306,13 +318,6 @@
       <IsAppExtension>true</IsAppExtension>
       <IsWatchApp>false</IsWatchApp>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="AppResources.de.resx" />
-    <EmbeddedResource Include="AppResources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <Import Project="..\dieKlingel\dieKlingel.projitems" Label="Shared" />

@@ -20,7 +20,7 @@ namespace dieKlingel.iOS.Extension.Notification
         {
             ContentHandler = contentHandler;
             BestAttemptContent = (UNMutableNotificationContent)request.Content.MutableCopy();
-
+            System.Diagnostics.Debug.WriteLine("Modify Content");
             /*InvokeInBackground(() =>
             {
                 NSThread.SleepFor(1);
@@ -33,10 +33,13 @@ namespace dieKlingel.iOS.Extension.Notification
             //self.bestAttemptContent.title = @"K";
             //self.bestAttemptContent.subtitle = @"";
             //self.bestAttemptContent.body = @"";
+            BestAttemptContent.Title += ".";
 
             // Set the attachment
+            
             NSDictionary dict = BestAttemptContent.UserInfo;
             NSString imgUrl = dict["image-path"] as NSString;
+            
 
             if (imgUrl.Length == null)
             {
@@ -48,9 +51,10 @@ namespace dieKlingel.iOS.Extension.Notification
                 {
                     BestAttemptContent.Attachments = new UNNotificationAttachment[] { attach };
                 }
-                
+
                 ContentHandler(BestAttemptContent);
-            });
+            }); 
+            //ContentHandler(BestAttemptContent);
         }
         delegate void CompletionHandler(UNNotificationAttachment attach);
         void LoadAttachmentForUrlString(string urlString, string type, CompletionHandler completionHandler)

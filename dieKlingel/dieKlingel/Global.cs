@@ -58,7 +58,7 @@ namespace dieKlingel
         {
             get
             {
-                return Preferences.Get("CtDomain", "https://dieklingel.com");
+                return Preferences.Get("CtDomain", "https://ct.dieklingel.com");
             }
             set
             {

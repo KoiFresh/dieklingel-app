@@ -20,8 +20,6 @@ namespace dieKlingel.Controls.Editor
         private IniDataParser parser = new IniDataParser();
         private IniData data;
 
-        
-
         public Ini()
         {
             InitializeComponent();

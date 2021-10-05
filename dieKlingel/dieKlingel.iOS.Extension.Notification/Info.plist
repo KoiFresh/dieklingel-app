@@ -9,11 +9,11 @@
 	<key>CFBundleExecutable</key>
 	<string>dieKlingel.iOS.Extension.Notification</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.dieklingel.app.iOSExtensionNotification</string>
+	<string>com.dieklingel.app.dieKlingel.iOS.Extension.Notification</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>com.dieKlingel.app.ExtensionNotification</string>
+	<string>com.dieklingel.app.dieKlingel.iOS.Extension.Notification</string>
 	<key>CFBundlePackageType</key>
 	<string>XPC!</string>
 	<key>CFBundleShortVersionString</key>

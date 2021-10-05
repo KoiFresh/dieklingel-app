@@ -34,7 +34,9 @@ namespace dieKlingel.Droid
             ToolbarResource = Resource.Layout.Toolbar;
 
             base.OnCreate(bundle);
-            global::Xamarin.Forms.Forms.Init(this, bundle);
+            // Set Flag to use the Expander Item in Editor.Json();
+            Forms.SetFlags(new string[] { "Expander_Experimental" });
+            //global::Xamarin.Forms.Forms.Init(this, bundle);
             global::Xamarin.Essentials.Platform.Init(this, bundle);
 
             UserDialogs.Init(this);
@@ -64,7 +66,9 @@ namespace dieKlingel.Droid
                     File.WriteAllText(factory_path, content);
                 }
             }
+
             Forms.Init(this, bundle);
+
             App.ConfigFilePath = rc_path;
             App.FactoryFilePath = factory_path;
 

@@ -24,6 +24,8 @@ namespace dieKlingel.iOS
         //
         public override bool FinishedLaunching(UIApplication app, NSDictionary options)
         {
+            // Set Flag to use the Expander Item in Editor.Json();
+            Forms.SetFlags("Expander_Experimental");
             global::Xamarin.Forms.Forms.Init();
             LoadApplication(new App(IntPtr.Zero));
 
@@ -43,9 +45,7 @@ namespace dieKlingel.iOS
 
             if (UIDevice.CurrentDevice.CheckSystemVersion(8, 0))
             {
-                var pushSettings = UIUserNotificationSettings.GetSettingsForTypes(
-                                   UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound,
-                                   new NSSet());
+                UIUserNotificationSettings pushSettings = UIUserNotificationSettings.GetSettingsForTypes(UIUserNotificationType.Alert | UIUserNotificationType.Badge | UIUserNotificationType.Sound,new NSSet());
                 UIApplication.SharedApplication.RegisterUserNotificationSettings(pushSettings);
                 UIApplication.SharedApplication.RegisterForRemoteNotifications();
             }
@@ -69,7 +69,7 @@ namespace dieKlingel.iOS
             // Get previous device token
             var oldDeviceToken = NSUserDefaults.StandardUserDefaults.StringForKey("PushDeviceToken");
             // Has the token changed?
-            if (string.IsNullOrEmpty(oldDeviceToken) || !oldDeviceToken.Equals(DeviceToken))
+            if (true) //string.IsNullOrEmpty(oldDeviceToken) || !oldDeviceToken.Equals(DeviceToken))
             {
                 //TODO: Put your own logic here to notify your server that the device token has changed/been created!
                 byte[] result = new byte[deviceToken.Length];
@@ -96,7 +96,7 @@ namespace dieKlingel.iOS
 
         public override void DidReceiveRemoteNotification(UIApplication application, NSDictionary userInfo, Action<UIBackgroundFetchResult> completionHandler)
         {
-            // base.DidReceiveRemoteNotification(application, userInfo, completionHandler);
+            // base.DidReceiveRemoteNotification(application, userInfo, completionHandler); // will end in an error -> Foundation.You_Should_Not_Call_base_In_This_Method
             string action = userInfo["action"].ToString();
 
             if (application.ApplicationState != UIApplicationState.Active)

@@ -9,10 +9,15 @@
         <ToolbarItem 
             Text="&#128190;"
             Order="Primary"
-            Priority="1"
+            Priority="2"
             Clicked="BtnSave_Clicked"/>
         <ToolbarItem 
-            Text="	&#10133;"
+            Text="&#10226;"
+            Order="Primary"
+            Priority="1"
+            Clicked="BtnReload_Clicked"/>
+        <ToolbarItem 
+            Text="&#10133;"
             Order="Primary"
             Priority="0"
             Clicked="BtnAdd_Clicked"/>
