@@ -17,20 +17,94 @@ namespace dieKlingel.Pages
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class Account : ContentPage
     {
+        #region private const
+        private const string CANCEL_TEXT = "Abbrechen";
+        private const string NONE = "none";
+        #endregion
+
+        #region private variables
+        private readonly App app = (App)App.Current;
+        #endregion
+
+       
         public Account()
         {
             InitializeComponent();
-            EntryCtUsername.Text = Global.CtUsername;
+            EntryCtUsername.Text = app.Doorunit?.Username;
+            EntryCtPassword.Text = app.Doorunit?.Password;
+            EntryCtDomain.Text = app.Doorunit?.Url?.ToString();
+            BtnAccountInfo.IsVisible = app.Doorunit?.IsRegisterd ?? false;
+            /*EntryCtUsername.Text = Global.CtUsername;
             EntryCtPassword.Text = Global.Key;
             EntryCtDomain.Text = Global.CtDomain;
             if (Global.User.Count > 0)
             {
                 BtnAccountInfo.IsVisible = true;
-            }
+            } */
         }
 
         private async void BtnSave_Clicked(object sender, EventArgs e)
         {
+            if (String.IsNullOrEmpty(EntryCtUsername.Text) ||
+                String.IsNullOrEmpty(EntryCtPassword.Text) ||
+                String.IsNullOrEmpty(EntryCtDomain.Text))
+            {
+                await DisplayAlert("Error", "Bitte Fülle alle Felder aus!", "Ok");
+                return;
+            }
+            app.Doorunit = new Doorunit(app.Core ,EntryCtUsername.Text, EntryCtPassword.Text, EntryCtDomain.Text);
+            Dup.Notification notification = Dup.Notification.Build(Dup.Context.Register, new Dup.Data());
+            Dup.Response response = await app.Doorunit.SendAsync(notification);
+            if(!response.Ok)
+            {
+                await DisplayAlert("Error", response.Message, "Ok");
+                return;
+            }
+            Dup.IDataUsers payload = response.Notification.Body.Data;
+            string selection = await DisplayActionSheet("Account auswählen", CANCEL_TEXT , null, payload.Users.Select(x => x.Displayname).ToArray());
+            if(selection == CANCEL_TEXT ||
+                selection == null)
+            {
+                return;
+            }
+           
+            foreach(dieKlingel.Account user in payload.Users)
+            {
+                if(selection == user.Displayname)
+                {
+                    string message = "Passwort";
+                    bool repeat = true;
+                    do
+                    {
+                        PromptResult result = await UserDialogs.Instance.PromptAsync(new PromptConfig
+                        {
+                            InputType = InputType.Password,
+                            OkText = "Ok",
+                            CancelText = CANCEL_TEXT,
+                            Title = user.Displayname,
+                            Message = message,
+                            AutoCorrectionConfig = AutoCorrectionConfig.No
+                        }) ;
+                        if(!result.Ok || result.Text == user.Password)
+                        {
+                            // set the doorunit user -> the account will be registerd on the sip server
+                            app.Doorunit.SetUser(user);
+                            // now last is to send a device update to the unit
+                            notification = Dup.Notification.Build(Dup.Context.DeviceUpdate, (Dup.Data)app.Doorunit.GetDeviceUpdateDataPayload(App.PushToken));
+                            await app.Doorunit.SendAsync(notification);
+                            // all work is done, go back to root
+                            await Navigation.PopToRootAsync();
+                            repeat = false;
+                        }
+                        message = "Leider Falsch! Erneut versuchen";
+                    } while (repeat);
+                    break;
+                }
+                // set at the end, because it only will be saved when app.Doorunit is set
+            }
+
+            #region deprectaed 
+            /*
             if (EntryCtDomain.Text == String.Empty || EntryCtPassword.Text == String.Empty || EntryCtUsername.Text == String.Empty)
             {
                 await DisplayAlert("Error", "Fülle alle Felder aus!", "Ok");
@@ -81,10 +155,6 @@ namespace dieKlingel.Pages
                             Message = message
                         });
 
-
-                        /*password = await DisplayPromptAsync(display_name, message, "Ok", "Abbrechen");
-                        if (password == (string)account["password"])
-                        {*/
                         repeat = result.Ok;
                         if (result.Ok && result.Text == (string)account["password"])
                         { 
@@ -118,13 +188,28 @@ namespace dieKlingel.Pages
                 Socket.Send(Socket.Context.DeviceUpdate, obj);
                 await Navigation.PopToRootAsync();
             }
+            */
+            #endregion
         }
+
 
         private async void BtnAccountInfo_Clicked(object sender, EventArgs e)
         {
-            bool logout = !await DisplayAlert("Account", "Du bist als " + Global.User["displayname"] + " eingeloggt!", "Ok", "Ausloggen");
+            bool logout = !await DisplayAlert("Account", "Du bist als " + app.Doorunit.Account.Displayname + " eingeloggt!", "Ok", "Ausloggen");
             if (logout)
             {
+                Dup.Notification notification = Dup.Notification.Build(Dup.Context.DeviceUpdate, (Dup.Data)app.Doorunit.GetDeviceUpdateDataPayload(App.PushToken));
+                notification.Body.Data.Username = NONE;
+                Dup.Response response = await app.Doorunit.SendAsync(notification);
+                if(!response.Ok)
+                {
+                    await DisplayAlert("Error", response.Message, "Ok");
+                    return;
+                }
+                app.Doorunit.RemoveUser();
+                await Navigation.PopToRootAsync();
+                #region deprectaed
+                /*
                 if (Global.User.Count > 0)
                 {
                     JObject obj = JObject.Parse("{\"body\":{\"data\":{}}}");
@@ -144,7 +229,9 @@ namespace dieKlingel.Pages
 
                 Global.User = new JObject();
                 BtnAccountInfo.IsVisible = false;
-                Socket.SipClear();
+                Socket.SipClear(); 
+                */
+                #endregion
             }
         }
     }

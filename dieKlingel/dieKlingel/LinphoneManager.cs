@@ -7,7 +7,8 @@ using Xamarin.Forms;
 
 namespace dieKlingel
 {
-    class LinphoneManager
+    // 2021-11-12, 18:17 by Kai Mayer - changed class to public 
+    public class LinphoneManager
     {
         public Core Core { get; set; }
         LoggingService LoggingService

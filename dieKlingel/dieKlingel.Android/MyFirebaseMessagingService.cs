@@ -28,16 +28,30 @@ namespace dieKlingel.Droid
         {
             base.OnMessageReceived(message);
             System.Diagnostics.Debug.WriteLine("Message");
-            string action = message.Data["action"].ToString();
-            if(Global.IsInForeground)
+            //string action = message.Data["action"].ToString();
+         
+            //string body = message.Data.ContainsKey("body") ? message.Data["body"] : "Looks like something went wrong, please contact kai.mayer@dieklingel.com";
+            //string title = message.Data.ContainsKey("title") ? message.Data["title"] : "dieklingel.com";
+            if(message.GetNotification() != null)
             {
-                MessagingCenter.Send<object, string>(this, "Pushaction", action);
+                SendNotification(message.GetNotification().Title, message.GetNotification().Body, message.Data);
+            }else
+            {
+                string title = message.Data?["Title"] ?? "Title missing";
+                string body = message.Data?["Body"] ?? "Body missing";
+                SendNotification(title, body, message.Data);
+            }
+            
+
+            /*if (Global.IsInForeground)
+            {
+                //MessagingCenter.Send<object, string>(this, "Pushaction", action);
             }else
             {
                 string body = message.Data.ContainsKey("body") ? message.Data["body"] : "Looks like something went wrong, please contact kai.mayer@dieklingel.com";
                 string title = message.Data.ContainsKey("title") ? message.Data["title"] : "dieklingel.com";
                 SendNotification(title, body, message.Data);
-            }
+            } */
             
             //new NotificationHelper().CreateNotification(message.GetNotification().Title, message.GetNotification().Body);
         }
@@ -54,30 +68,36 @@ namespace dieKlingel.Droid
             var pendingIntent = PendingIntent.GetActivity(this, 100, intent, PendingIntentFlags.OneShot);
 
             NotificationCompat.Builder notificationBuilder;
-            notificationBuilder = new NotificationCompat.Builder(this, "doorunit_notification_channel")
-
+            //notificationBuilder = new NotificationCompat.Builder(this, "doorunit_notification_channel")
+            notificationBuilder = new NotificationCompat.Builder(this, "fcm_fallback_notification_channel")
                                   .SetContentTitle(title)
-                                  .SetSmallIcon(Resource.Drawable.icon)
+                                  //.SetSmallIcon(Resource.Drawable.icon)
                                   //.SetLargeIcon(Android.Graphics.BitmapFactory.DecodeResource(BaseContext.Resources, Resource.Drawable.icon))
+                                  .SetColor(0xffa100)
+                                  .SetSmallIcon(Resource.Drawable.icon_16x16)
                                   .SetContentText(messageBody)
                                   .SetAutoCancel(true)
                                   .SetContentIntent(pendingIntent);
 
-            if(data.ContainsKey("image-path"))
+            // if(data.ContainsKey("image-path")) // old way payload
+            if(data.ContainsKey("ImageUrl"))
             {
-                URLConnection connection = new URL(data["image-path"]).OpenConnection();
-                connection.DoInput = true;
-                connection.Connect();
-
-                NotificationCompat.BigPictureStyle style = new NotificationCompat.BigPictureStyle()
-                    .BigPicture(Android.Graphics.BitmapFactory.DecodeStream(connection.InputStream))
-                    .SetSummaryText(messageBody);
-
-                notificationBuilder.SetStyle(style);
-            }
-
+                try
+                {
+                    URLConnection connection = new URL(data["ImageUrl"]).OpenConnection();
+                    connection.DoInput = true;
+                    connection.Connect();
+                    NotificationCompat.BigPictureStyle style = new NotificationCompat.BigPictureStyle()
+                        .BigPicture(Android.Graphics.BitmapFactory.DecodeStream(connection.InputStream))
+                        .SetSummaryText(messageBody);
+                    notificationBuilder.SetStyle(style);
+                }catch(Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine("An Error occured while downloading a notification Image", e.Message);
+                }
+            } 
             var notificationManager = NotificationManagerCompat.From(this);
-            notificationManager.Notify(100, notificationBuilder.Build());
+            notificationManager.Notify(new Random().Next(), notificationBuilder.Build());
         }
     }
 }

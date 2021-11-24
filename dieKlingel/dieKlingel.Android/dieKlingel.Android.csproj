@@ -36,6 +36,7 @@
     <AndroidEnableProfiledAot>false</AndroidEnableProfiledAot>
     <BundleAssemblies>false</BundleAssemblies>
     <AndroidEnableMultiDex>true</AndroidEnableMultiDex>
+    <AndroidTlsProvider>btls</AndroidTlsProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugSymbols>false</DebugSymbols>
@@ -98,11 +99,23 @@
     <PackageReference Include="ini-parser-netstandard">
       <Version>2.5.2</Version>
     </PackageReference>
+    <PackageReference Include="LibVLCSharp">
+      <Version>3.6.1</Version>
+    </PackageReference>
+    <PackageReference Include="LibVLCSharp.Forms">
+      <Version>3.6.1</Version>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>12.0.3</Version>
     </PackageReference>
     <PackageReference Include="Plugin.CurrentActivity">
       <Version>2.1.0.4</Version>
+    </PackageReference>
+    <PackageReference Include="Plugin.MediaManager">
+      <Version>1.0.9</Version>
+    </PackageReference>
+    <PackageReference Include="Plugin.MediaManager.Forms">
+      <Version>1.0.9</Version>
     </PackageReference>
     <PackageReference Include="RestSharp">
       <Version>106.11.7</Version>
@@ -112,6 +125,9 @@
     </PackageReference>
     <PackageReference Include="SSH.NET">
       <Version>2020.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="VideoLAN.LibVLC.Android">
+      <Version>3.2.0.1</Version>
     </PackageReference>
     <PackageReference Include="Xam.Plugin.Connectivity">
       <Version>4.0.0.190-beta</Version>
@@ -167,7 +183,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AppResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Controller.cs" />
+    <Compile Include="Audio.cs" />
     <Compile Include="MainActivity.cs" />
     <Compile Include="MyFirebaseIIDService.cs" />
     <Compile Include="MyFirebaseMessagingService.cs" />
@@ -296,6 +312,9 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\drawable\delete.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\icon_16x16.png" />
   </ItemGroup>
   <Import Project="..\dieKlingel\dieKlingel.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />

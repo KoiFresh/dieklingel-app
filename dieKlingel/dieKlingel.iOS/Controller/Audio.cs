@@ -7,10 +7,11 @@ using UIKit;
 
 namespace dieKlingel
 {
-    namespace Audio
+    namespace Controller
     {
-        class Controller
+        class Audio
         {
+            private static SpeakerMode speakerState = SpeakerMode.OnEar;
             // gibt true zurück wenn der Lautsprecher aktiviert wurde
             public static bool TurnSpeakerOn()
             {
@@ -44,6 +45,7 @@ namespace dieKlingel
                 {
                     System.Diagnostics.Debug.WriteLine(new Exception(error?.LocalizedDescription ?? "Cannot set category"));
                 }
+                speakerState = result ? SpeakerMode.Speaker : SpeakerMode.OnEar;
                 return result;
             }
 
@@ -80,7 +82,21 @@ namespace dieKlingel
                 {
                     System.Diagnostics.Debug.WriteLine(new Exception(error?.LocalizedDescription ?? "Cannot set category"));
                 }
+                speakerState = result ? SpeakerMode.OnEar: SpeakerMode.Speaker;
                 return result;
+            }
+
+            public static SpeakerMode SpeakerState
+            {
+                get
+                {
+                    return speakerState;
+                }
+            }
+            public enum SpeakerMode
+            {
+                OnEar,
+                Speaker
             }
         }
     }

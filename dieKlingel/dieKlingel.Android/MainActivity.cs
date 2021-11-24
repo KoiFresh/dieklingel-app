@@ -17,6 +17,8 @@ using Android.Content;
 using Plugin.CurrentActivity;
 using Android.Util;
 using Acr.UserDialogs;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace dieKlingel.Droid
 {
@@ -27,7 +29,8 @@ namespace dieKlingel.Droid
         TextureView displayCamera;
         internal static readonly string CHANNEL_ID = "doorunit_notification_channel";
         internal static readonly int NOTIFICATION_ID = 100;
-        SampleReceiver receiver;
+        BReceiver receiver;
+
         protected override void OnCreate(Bundle bundle)
         {
             TabLayoutResource = Resource.Layout.Tabbar;
@@ -41,8 +44,10 @@ namespace dieKlingel.Droid
 
             UserDialogs.Init(this);
 
-            receiver = new SampleReceiver();
+            receiver = new BReceiver();
+
             CreateNotificationChannel();
+
             CrossCurrentActivity.Current.Init(this, bundle);
 
             AssetManager assets = Assets;
@@ -69,6 +74,8 @@ namespace dieKlingel.Droid
 
             Forms.Init(this, bundle);
 
+            Firebase.FirebaseApp.InitializeApp(this);
+
             App.ConfigFilePath = rc_path;
             App.FactoryFilePath = factory_path;
 
@@ -79,7 +86,8 @@ namespace dieKlingel.Droid
             System.Diagnostics.Debug.WriteLine("MANUFACTURER=" + Build.Manufacturer);
             System.Diagnostics.Debug.WriteLine("SDK=" + Build.VERSION.Sdk);
 
-
+            //LibVLCSharp.Forms.Shared.LibVLCSharpFormsRenderer.Init();
+            //CrossMediaManager.Current.Init();
             // Camera View
 
             // 2020-12-28, 20:24 by Kai Mayer // 
@@ -107,9 +115,9 @@ namespace dieKlingel.Droid
             //app.SelfFrame().Content = fl2.ToView();
 
             //app.Core.NativePreviewWindowId = captureCamera.Handle;
-            Global.Core.NativeVideoWindowId = displayCamera.Handle;
-//            Global.Core.VideoDisplayEnabled = true;
-//            Global.Core.VideoPreviewEnabled = false;
+            app.Core.NativeVideoWindowId = displayCamera.Handle;
+            //            Global.Core.VideoDisplayEnabled = true;
+            //            Global.Core.VideoPreviewEnabled = false;
 
             // Set audio to speaker
             AudioManager am = (AudioManager)Android.App.Application.Context.GetSystemService(Android.Content.Context.AudioService);
@@ -117,31 +125,19 @@ namespace dieKlingel.Droid
             am.SpeakerphoneOn = true;
             //am.SetStreamVolume(Android.Media.Stream.VoiceCall, am.GetStreamMaxVolume(Android.Media.Stream.VoiceCall), VolumeNotificationFlags.ShowUi);
 
-            if (Intent.Extras != null)
-            {
-                foreach (var key in Intent.Extras.KeySet())
-                {
-                    var value = Intent.Extras.GetString(key);
-                    if (key == "action")
-                    {
-                        if (value?.Length > 0)
-                        {
-                            string action = "direct" + value;
-
-                            MessagingCenter.Send<object, string>(this, "Pushaction", action);
-                            break;
-                        }
-                    }
-                }
-            } 
             LoadApplication(app);
+            if(null != Intent.Extras)
+            {
+                MessagingCenter.Send<object, IntentContent>(this, "intent", HandleIntent(Intent));
+            }
         }
 
         protected override void OnResume()
         {
             base.OnResume();
 
-            if (Int32.Parse(Build.VERSION.Sdk) >= 23)
+            //if (Int32.Parse(Build.VERSION.Sdk) >= 23)
+            if(Build.VERSION.SdkInt >= BuildVersionCodes.M)
             {
                 List<string> Permissions = new List<string>();
                 if (CheckSelfPermission(Manifest.Permission.Camera) != Permission.Granted)
@@ -162,23 +158,20 @@ namespace dieKlingel.Droid
         protected override void OnNewIntent(Intent intent)
         {
             base.OnNewIntent(intent);
-            if (intent.Extras != null)
-            {
-                foreach (var key in intent.Extras.KeySet())
-                {
-                    var value = intent.Extras.GetString(key);
-                    if (key == "action")
-                    {
-                        if (value?.Length > 0)
-                        {
-                            string action = "direct" + value;
+            MessagingCenter.Send<object, IntentContent>(this, "intent", HandleIntent(intent));
+        }
 
-                            MessagingCenter.Send<object, string>(this, "Pushaction", action);
-                            break;
-                        }
-                    }
-                }
+        private IntentContent HandleIntent(Intent intent)
+        {
+            IntentContent content = new IntentContent();
+            if (null != intent.Extras)
+            {
+                Bundle bundle = intent.Extras;
+                Dictionary<string, string> dict = bundle.KeySet().ToDictionary<string, string, string>(key => key, key => bundle.Get(key).ToString());
+                string json = JsonConvert.SerializeObject(dict);
+                content = JsonConvert.DeserializeObject<IntentContent>(json);
             }
+            return content;
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Permission[] grantResults)
@@ -188,7 +181,7 @@ namespace dieKlingel.Droid
                 int i = 0;
                 foreach (string permission in permissions)
                 {
-                    Log.Info("LinphoneXamarin", "Permission " + permission + " : " + grantResults[i]);
+                    Log.Info("dieKlingel", "Permission " + permission + " : " + grantResults[i]);
                     i += 1;
                 }
             }
@@ -205,7 +198,19 @@ namespace dieKlingel.Droid
                 return;
             }
 
-            var alarmAttributes = new AudioAttributes.Builder()
+
+            NotificationChannel chan = new NotificationChannel("fcm_fallback_notification_channel", "Miscellaneous", NotificationImportance.High);
+            chan.EnableVibration(true);
+            chan.LockscreenVisibility = NotificationVisibility.Public;
+            chan.SetSound(Android.Net.Uri.Parse("android.resource://com.dieklingel.app/raw/long_sound"), null);
+
+            NotificationManager notificationManager = (NotificationManager)GetSystemService(NotificationService);
+            notificationManager.CreateNotificationChannel(chan);
+
+            
+
+            // should working wit notification channel
+            /*var alarmAttributes = new AudioAttributes.Builder()
                     .SetContentType(AudioContentType.Sonification)
                     .SetUsage(AudioUsageKind.Notification).Build();
 
@@ -213,13 +218,15 @@ namespace dieKlingel.Droid
 
             var channel = new NotificationChannel(CHANNEL_ID, "Doorunit Notifications", NotificationImportance.Default)
             {
-                Description = "Firebase Cloud Messages appear in this channel",
+                Description = "Doorbell Notifications appear in this channel",
             };
 
             channel.SetSound(alarmUri, alarmAttributes);
 
             var notificationManager = (NotificationManager)GetSystemService(Android.Content.Context.NotificationService);
-            notificationManager.CreateNotificationChannel(channel);
+            notificationManager.CreateNotificationChannel(channel); */
+
+
         }
     }
 }

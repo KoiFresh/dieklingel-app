@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="dieKlingel.Pages.Preview"
+             Title="Vorschau">
+    <ContentPage.Content>
+        <AbsoluteLayout 
+            BackgroundColor="White">
+            <ActivityIndicator 
+                AbsoluteLayout.LayoutFlags="PositionProportional"
+                AbsoluteLayout.LayoutBounds="0.5, 0.5"
+                IsRunning="True"/>
+            <Image 
+                x:Name="image" 
+                AbsoluteLayout.LayoutBounds="0,0,1,1" 
+                AbsoluteLayout.LayoutFlags="All" 
+                HorizontalOptions="FillAndExpand" 
+                VerticalOptions="FillAndExpand" 
+                Aspect="AspectFit" />
+            </AbsoluteLayout>
+    </ContentPage.Content>
+</ContentPage>

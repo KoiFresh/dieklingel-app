@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="2" android:versionName="1.4" package="com.dieklingel.app" android:installLocation="auto">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="2" android:versionName="1.5" package="com.dieklingel.app" android:installLocation="auto">
 	<uses-sdk android:minSdkVersion="27" android:targetSdkVersion="28" />
 	<uses-permission android:name="android.permission.USE_SIP" />
 	<uses-permission android:name="android.permission.CALL_PHONE" />
@@ -21,7 +21,7 @@
 	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 	<uses-permission android:name="android.permission.GET_ACCOUNTS" />
 	<uses-permission android:name="android.permission.USE_FINGERPRINT" />
-  <uses-permission android:name="android.permission.VIBRATE" />
+	<uses-permission android:name="android.permission.VIBRATE" />
 	<uses-feature android:name="android.software.sip" android:required="true" />
 	<uses-feature android:name="android.hardware.sip.voip" android:required="true" />
 	<uses-feature android:name="android.hardware.wifi" android:required="true" />
@@ -36,5 +36,6 @@
 				<category android:name="${applicationId}" />
 			</intent-filter>
 		</receiver>
+		<meta-data android:name="com.google.firebase.messaging.default_notification_icon" android:resource="@drawable/icon" />
 	</application>
 </manifest>

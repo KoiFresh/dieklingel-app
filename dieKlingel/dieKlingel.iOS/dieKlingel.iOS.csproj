@@ -63,6 +63,9 @@
     <CodesignProvision>VS: com.dieklingel.app Development</CodesignProvision>
     <MtouchLink>None</MtouchLink>
     <MtouchInterpreter>-all</MtouchInterpreter>
+    <OptimizePNGs>true</OptimizePNGs>
+    <MtouchSdkVersion>
+    </MtouchSdkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>none</DebugType>
@@ -70,7 +73,7 @@
     <OutputPath>bin\iPhone\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <MtouchArch>ARM64</MtouchArch>
+    <MtouchArch>ARMv7, ARM64</MtouchArch>
     <ConsolePause>false</ConsolePause>
     <CodesignKey>iPhone Distribution: Kai Mayer (3QLZPMLJ3W)</CodesignKey>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
@@ -116,7 +119,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>AppResources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Controller.cs" />
+    <Compile Include="Controller\Audio.cs" />
+    <Compile Include="Controller\Call.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
     <None Include="Entitlements.plist" />
@@ -197,8 +201,20 @@
     <PackageReference Include="ini-parser-netstandard">
       <Version>2.5.2</Version>
     </PackageReference>
+    <PackageReference Include="LibVLCSharp">
+      <Version>3.6.1</Version>
+    </PackageReference>
+    <PackageReference Include="LibVLCSharp.Forms">
+      <Version>3.6.1</Version>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>12.0.3</Version>
+    </PackageReference>
+    <PackageReference Include="Plugin.MediaManager">
+      <Version>1.0.9</Version>
+    </PackageReference>
+    <PackageReference Include="Plugin.MediaManager.Forms">
+      <Version>1.0.9</Version>
     </PackageReference>
     <PackageReference Include="RestSharp">
       <Version>106.11.7</Version>
@@ -208,6 +224,9 @@
     </PackageReference>
     <PackageReference Include="SSH.NET">
       <Version>2020.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="VideoLAN.LibVLC.iOS">
+      <Version>3.3.17</Version>
     </PackageReference>
     <PackageReference Include="Xam.Plugin.DeviceInfo">
       <Version>4.1.1</Version>
@@ -312,13 +331,18 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\dieKlingel.iOS.Extension.Notification\dieKlingel.iOS.Extension.Notification.csproj">
-      <Project>{34e064c4-2983-45da-917d-4444edc4b241}</Project>
-      <Name>dieKlingel.iOS.Extension.Notification</Name>
+    <ProjectReference Include="..\ExtensionNotification\ExtensionNotification.csproj">
+      <Project>{4cfc1eee-48c2-4fa0-b984-1869e74ea81e}</Project>
+      <Name>ExtensionNotification</Name>
       <IsAppExtension>true</IsAppExtension>
       <IsWatchApp>false</IsWatchApp>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
   <Import Project="..\dieKlingel\dieKlingel.projitems" Label="Shared" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties TriggeredFromHotReload="False" />
+    </VisualStudio>
+  </ProjectExtensions>
 </Project>

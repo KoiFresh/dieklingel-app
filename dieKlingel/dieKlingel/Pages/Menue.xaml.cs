@@ -26,6 +26,15 @@ namespace dieKlingel.Pages
                     return 0;
                 }
             });
+            /*MenueItems.Add(new MenueListTemplate
+            {
+                Text = "Preview",
+                Clicked = () =>
+                {
+                    Navigation.PushAsync(new Pages.Preview("https://dieklingel.com/images/x.jpg"));
+                    return 0;
+                }
+            }); */
             MenueItems.Add(new MenueListTemplate
             {
                 Text = "Verbinden",

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Foundation;
+using MediaManager;
+using MediaManager.Forms.Platforms.iOS;
 using UIKit;
 using Xamarin.Forms;
 using Xamarin.Forms.Platform.iOS;
@@ -26,6 +28,7 @@ namespace dieKlingel.iOS
         {
             // Set Flag to use the Expander Item in Editor.Json();
             Forms.SetFlags("Expander_Experimental");
+            CrossMediaManager.Current.Init();
             global::Xamarin.Forms.Forms.Init();
             LoadApplication(new App(IntPtr.Zero));
 
@@ -37,9 +40,9 @@ namespace dieKlingel.iOS
             NativeViewWrapper displayWrapper = (NativeViewWrapper)((App)App.Current).ViedoFrame().Content;
             UIView displayView = (UIView)displayWrapper.NativeView;
 
-            Global.Core.NativeVideoWindowId = displayView.Handle;
-            Global.Core.VideoDisplayEnabled = true;
-            Global.Core.VideoPreviewEnabled = false;
+            ((App)App.Current).Core.NativeVideoWindowId = displayView.Handle;
+            ((App)App.Current).Core.VideoDisplayEnabled = true;
+            ((App)App.Current).Core.VideoPreviewEnabled = false;
 
             // Push notification
 
@@ -78,7 +81,8 @@ namespace dieKlingel.iOS
                 System.Diagnostics.Debug.WriteLine("Token:" + token);
                 //Preferences.Set("Push/Token", token);
                 //Settings.Push.Token.Value = token;
-                Global.OwnPushToken = token;
+                //Global.OwnPushToken = token;
+                App.PushToken = token;
             }
             // Save new device token
             NSUserDefaults.StandardUserDefaults.SetString(DeviceToken, "PushDeviceToken");

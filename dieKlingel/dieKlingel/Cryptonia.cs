@@ -64,7 +64,7 @@ namespace dieKlingel
 
         public static string Normalize(string text, int length = 32)
         {
-            string result = text;
+            string result = (text.Length < 1) ? "0" : text;
             while(result.Length < length)
             {
                 result += text;

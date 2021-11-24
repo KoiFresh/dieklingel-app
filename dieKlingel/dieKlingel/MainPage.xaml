@@ -15,11 +15,13 @@
         </ToolbarItem>
     </ContentPage.ToolbarItems>
 
-    <AbsoluteLayout>
+    <AbsoluteLayout
+        BackgroundColor="{AppThemeBinding Light=White, Dark=Black}">
    
         <ContentView 
             x:Name="video_frame"
-            BackgroundColor="{AppThemeBinding Light=White,Dark=Black}">
+            BackgroundColor="{AppThemeBinding Light=White,Dark=Black}"
+            IsVisible="false">
         </ContentView>
 
             <!--
@@ -107,7 +109,7 @@
                     HasShadow="False">
                     <ImageButton
                         x:Name="BtnCall"
-                        BackgroundColor="Red"
+                        BackgroundColor="#15ad17"
                         Source="phone.png"
                         Clicked="BtnCall_Clicked"
                         HorizontalOptions="Center"
@@ -122,7 +124,7 @@
                     HasShadow="False">
                     <ImageButton
                         x:Name="BtnMute"
-                        BackgroundColor="Red"
+                        BackgroundColor="#bababa"
                         Source="mic.png"
                         Clicked="BtnMute_Clicked"
                         HorizontalOptions="Center"

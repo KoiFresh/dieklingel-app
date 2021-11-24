@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using Firebase.Messaging;
 using Firebase.Iid;
+using Android.Support.V4.App;
 
 namespace dieKlingel.Droid
 {
@@ -24,18 +25,18 @@ namespace dieKlingel.Droid
             System.Diagnostics.Debug.WriteLine("Token:" + FirebaseInstanceId.Instance.Token);
             //Preferences.Set("Push/Token", FirebaseInstanceId.Instance.Token);
             //Settings.Push.Token.Value = FirebaseInstanceId.Instance.Token;
-            Global.OwnPushToken = FirebaseInstanceId.Instance.Token;
+            //Global.OwnPushToken = FirebaseInstanceId.Instance.Token;
+            App.PushToken = FirebaseInstanceId.Instance.Token;
         }
     } 
 
 
     [BroadcastReceiver(Enabled = false, Exported = false)]
-    public class SampleReceiver : BroadcastReceiver
+    public class BReceiver : BroadcastReceiver
     {
         public override void OnReceive(Context context, Intent intent)
         {
             // Do stuff here.
-
             String value = intent.GetStringExtra("key");
         }
     } 

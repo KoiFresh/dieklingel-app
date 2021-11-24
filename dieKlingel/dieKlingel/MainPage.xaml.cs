@@ -10,129 +10,232 @@ using Xamarin.Forms;
 using Linphone;
 using Newtonsoft.Json.Linq;
 using Acr.UserDialogs;
+using dieKlingel;
+
+/**
+ * Main Page of the app
+ * @author Kai Mayer
+ */
 
 namespace dieKlingel
 {
     public partial class MainPage : ContentPage
     {
-        private const string grey = "#bababa";
+        #region private const
+        private const string COLOR_GREY_HEX = "#bababa";
         private const string darkgrey = "#969696";
-        private const string red = "#f51414";
-        private const string green = "#15ad17";
-        private const string darkorange = "#e6c13e";
+        private const string COLOR_RED_HEX = "#f51414";
+        private const string COLOR_GREEN_HEX = "#15ad17";
+        private const string COLOR_BLUE_HEX = "#0d9fbf"; // used in xaml
+        private const string COLOR_YELLOW_HEX = "#e6c13e"; // used in xaml
+        #endregion
 
+        #region private variables
+        private readonly App app = (App)App.Current;
         private Color navBarTextColor;
         private Color navBarBackgroundColor;
- 
-        public bool MicrophoneIsMuted { get; set; }
-        public bool MainControlsHidden { get; set; }
-        private bool SpeakerIsEnabled { get; set; }
-        private bool CallIsActive { get; set; }
+        private bool mainControlsVisible = true;
+        private bool singleShotOnAppearing = false;
+        private bool micEnabledSaveState = false;
+        private bool micEnabled
+        {
+            get
+            {
+                return micEnabledSaveState;
+            }
+            set
+            {
+                micEnabledSaveState = value;
+                app.Core.MicEnabled = micEnabledSaveState;
+            }
+        }
+        #endregion
 
-        private bool one_shot = false;
+        #region public variables 
+        #endregion
+
         public MainPage()
         {
             InitializeComponent();
             BindingContext = this;
-            Global.Core.Listener.OnRegistrationStateChanged += OnRegistration;
-            Global.Core.Listener.OnCallStateChanged += OnCall;
-            Global.Core.SelfViewEnabled = false;
-            SetMicMutedState(BtnMute, Global.Core.CurrentCall, true);
-            InterpreteCallButtonState(BtnCall, Global.Core.CurrentCall);
-            if (Global.User.Count > 0)
-            {
-                Socket.SipUpdate((string)Global.User["username"], (string)Global.User["password"], (string)Global.User["sip"]["domain"], (int)Global.User["sip"]["port"]);
-                JObject obj = JObject.Parse("{\"body\":{\"data\":{}}}");
-                obj["body"]["data"]["devicename"] = Plugin.DeviceInfo.CrossDeviceInfo.Current.Id;
-                obj["body"]["data"]["os"] = DeviceInfo.Platform.ToString();
-                obj["body"]["data"]["username"] = Global.User["username"];
-                obj["body"]["data"]["token"] = Global.OwnPushToken;
-#if __IOS__
-                obj["body"]["data"]["server"] = "apple.com";
-#endif
-#if __ANDROID__
-                obj["body"]["data"]["server"] = "googleapis.com";
-#endif
-                obj["body"]["data"]["sound"] = "normal_sound";
-                Socket.Send(Socket.Context.DeviceUpdate, obj);
-            }
-            MessagingCenter.Subscribe<object, string>(this, "Pushaction", Pushaction);
+            app.Core.Listener.OnRegistrationStateChanged += OnRegistrationStateChanged;
+            app.Core.Listener.OnCallStateChanged += OnCallStateChanged;
+            app.Core.SelfViewEnabled = false;
+            MessagingCenter.Subscribe<object, IntentContent>(this, "intent", OnIntentContentAvailable);
+            System.Diagnostics.Debug.WriteLine("PushToken: " + App.PushToken);
         }
 
-        protected override void OnAppearing()
+        #region override methods
+        /**
+         * called everytime when the page goes into foreground
+         */
+        protected override async void OnAppearing()
         {
             base.OnAppearing();
-            if(!one_shot)
+            if(!singleShotOnAppearing)
             {
-                one_shot = true;
-                SpeakerIsEnabled = dieKlingel.Audio.Controller.TurnSpeakerOn();
+                singleShotOnAppearing = true;
+                dieKlingel.Controller.Audio.TurnSpeakerOn();
+
+                if((app.Doorunit?.IsRegisterd ?? false))
+                {
+                    Dup.Data payload = (Dup.Data)app.Doorunit.GetDeviceUpdateDataPayload(App.PushToken);
+                    Dup.Notification notification = Dup.Notification.Build(Dup.Context.DeviceUpdate, payload);
+                    await app.Doorunit.SendAsync(notification);
+                }
+                BtnMute.IsEnabled = false;
+                BtnMute.BackgroundColor = Color.FromHex(COLOR_GREY_HEX);
+                BtnCall.BackgroundColor = Color.FromHex(COLOR_GREEN_HEX);
+                // check if not phone
+                if (Device.Idiom != TargetIdiom.Phone)
+                {
+                    FlMainControls.Children.Remove((Frame)BtnSpeaker.Parent); // remove the speaker button if not on phone
+                }
+                app.Doorunit?.RefreshRegister();
             }
-            //TbItemState.Text = Global.RegistrationState.ToString();
         }
 
+        /**
+         * called when the screen size changes e.g. on rotate
+         */
         protected override void OnSizeAllocated(double width, double height)
         {
             base.OnSizeAllocated(width, height); //must be called
             video_frame.HeightRequest = (int)height;
             video_frame.WidthRequest = (int)width;
         }
+        #endregion
 
-        private async void Pushaction(object obj, string pushaction)
+        #region button clicked methods
+        /**
+         * button settings clicked
+         */
+        private async void BtnSettings_Clicked(object sender, EventArgs e)
         {
-            if (Global.User.Count > 0)
-            {
-                string number = "sip:" + (string)Global.User["doorunit"] + "@" + (string)Global.User["sip"]["domain"] + ":" + (string)Global.User["sip"]["port"];
-                switch (pushaction)
-                {
-                    case "call":
-                        Device.BeginInvokeOnMainThread(async () =>
-                        {
-                            Vibration.Vibrate();
-                            bool answer = await DisplayAlert("DingDong", "Es wurde geklingelt, möchtest du annehemen ?", "Ja", "Nein");
+            await Navigation.PushAsync(new Pages.Menue());
+        }
 
-                            if (answer)
-                            {
-                                await Navigation.PopToRootAsync();
-                                InterpreteCallButtonState(BtnCall, Global.Core.CurrentCall, number, true);
-                            }
-                        });
-                        break;
-                    case "directcall":
-                        Debug.WriteLine("Notify Call started");
-                        await Navigation.PopToRootAsync();
-                        InterpreteCallButtonState(BtnCall, Global.Core.CurrentCall, number, true);
-                        break;
-                }
+        /**
+         * button call clicked
+         */
+        private async void BtnCall_Clicked(object sender, EventArgs e)
+        {
+            if (!app.Doorunit?.IsRegisterd ?? false)
+            {
+                await Navigation.PushAsync(new Pages.Account());
+                return;
+            }
+            if (app.Core.CallsNb > 0)
+            {
+                // end all existing call 
+                app.Core.TerminateAllCalls();
+            }
+            else
+            {
+                // start a new call
+                CallParams callParams = app.Core.CreateCallParams(null);
+                callParams.VideoEnabled = true;
+                string inviteUrl = "sip:" + app.Doorunit.Account.Number + "@" + app.Doorunit.Account.Sip.Domain + ":" + app.Doorunit.Account.Sip.Port.ToString();
+                app.Core.InviteWithParams(inviteUrl, callParams);
             }
         }
 
-        private void OnRegistration(Core ls, ProxyConfig config, RegistrationState state, string message)
+        /**
+         * button mute clicked
+         */
+        private void BtnMute_Clicked(object sender, EventArgs e)
         {
-            Debug.WriteLine("Registration state changed: " + state);
-            Global.RegistrationState = state;
+            ToogleMic();
+        }
+
+        /**
+         * button unlock clicked
+         */
+        private async void BtnDoorUnlock_Clicked(object sender, EventArgs e)
+        {
+            if (!app.Doorunit?.IsRegisterd ?? false)
+            {
+                await Navigation.PushAsync(new Pages.Account());
+                return;
+            }
+            Dup.Notification notification = Dup.Notification.Build(Dup.Context.SecureUnlock, new Dup.Data());
+            Dup.Response response = await app.Doorunit.SendAsync(notification);
+            if (!response.Ok)
+            {
+                await DisplayAlert("Error", response.Message, "Ok");
+                return;
+            }
+            PlayUnlockAnimation();
+        }
+        /**
+         * on main surface clicked
+         */
+        private void BtnHideControls_Clicked(object sender, EventArgs e)
+        {
+            if ((app.Core.CurrentCall?.State ?? CallState.Error) == CallState.StreamsRunning)
+            {
+                SetMainControlsVisibile(!mainControlsVisible);
+            }
+        }
+
+        /**
+         * button speaker clicked
+         */
+        private void BtnSpeaker_Clicked(object sender, EventArgs e)
+        {
+            ToogleSpeaker();
+        }
+        #endregion
+        /**
+         * called when new intent content is available (click on push)
+         */
+        private async void OnIntentContentAvailable(object sender, IntentContent notification)
+        {
+            if (!string.IsNullOrEmpty(notification.ImageUrl))
+            {
+                if(Navigation.ModalStack.Count > 0)
+                {
+                    await Navigation.PopModalAsync();
+                }
+                await Navigation.PushModalAsync(new Pages.Preview(notification.ImageUrl));
+            }
+        }
+
+        /**
+         * called when the registration state of the linphone core changes
+         */
+        private void OnRegistrationStateChanged(Core ls, ProxyConfig config, RegistrationState state, string message)
+        {
+            System.Diagnostics.Debug.WriteLine("Registration state changed: " + state);
             TbItemState.Text = state.ToString();
         }
 
-        private void OnCall(Core lc, Call lcall, CallState state, string message)
+        /**
+         * called when the call state of the current call changes;
+         */
+        private void OnCallStateChanged(Core lc, Call lcall, CallState state, string message)
         {
             Debug.WriteLine("Call state changed: " + state);
-            SetMicMutedState(BtnMute, lcall, true);
-            InterpreteCallButtonState(BtnCall, lcall);
+            //SetMicMutedState(BtnMute, lcall, true);
+            //InterpreteCallButtonState(BtnCall, lcall);
             switch (lcall.State)
             {
+                case CallState.IncomingReceived:
+                    lcall.Decline(Reason.Declined);
+                    break;
                 case CallState.Connected:
                     lcall.CameraEnabled = false;
+                    // show the video winodw
                     //dieKlingel.Audio.Controller.TurnSpeakerOn();
-                    
-                    if(SpeakerIsEnabled)
+
+                    if (dieKlingel.Controller.Audio.SpeakerState == dieKlingel.Controller.Audio.SpeakerMode.Speaker)
                     {
-                        dieKlingel.Audio.Controller.TurnSpeakerOn();
+                        dieKlingel.Controller.Audio.TurnSpeakerOn();
                     }else
                     {
-                        dieKlingel.Audio.Controller.TurnSpeakerOff();
+                        dieKlingel.Controller.Audio.TurnSpeakerOff();
                     }
                     DeviceDisplay.KeepScreenOn = true;
-                    CallIsActive = true;
 #if __IOS__
                     navBarBackgroundColor = ((NavigationPage)Application.Current.MainPage).BarBackgroundColor;
                     ((NavigationPage)Application.Current.MainPage).BarBackgroundColor = Color.Black;
@@ -140,10 +243,23 @@ namespace dieKlingel
                     ((NavigationPage)Application.Current.MainPage).BarTextColor = Color.White;
 #endif
                     break;
+                case CallState.StreamsRunning:
+                    BtnMute.IsEnabled = true;
+                    BtnMute.BackgroundColor = Color.FromHex(COLOR_RED_HEX);
+                    BtnMute.Source = ImageSource.FromFile("micmuted.png");
+                    BtnCall.BackgroundColor = Color.FromHex(COLOR_RED_HEX);
+                    video_frame.IsVisible = true;
+                    micEnabled = false;
+                    break;
                 case CallState.End:
+                    BtnMute.IsEnabled = false;
+                    BtnMute.BackgroundColor = Color.FromHex(COLOR_GREY_HEX);
+                    BtnMute.Source = ImageSource.FromFile("micmuted.png");
+                    BtnCall.BackgroundColor = Color.FromHex(COLOR_GREEN_HEX);
                     DeviceDisplay.KeepScreenOn = false;
-                    CallIsActive = false;
-                    HideMainControls(false);
+                    // hide the video window
+                    video_frame.IsVisible = false;
+                    SetMainControlsVisibile(true);
 #if __IOS__
                     ((NavigationPage)Application.Current.MainPage).BarBackgroundColor = navBarBackgroundColor;
                     ((NavigationPage)Application.Current.MainPage).BarTextColor = navBarTextColor;
@@ -152,149 +268,83 @@ namespace dieKlingel
                     break;
             }
         }
-        private void SetMicMutedState(ImageButton button, Call call, bool micMutedState, bool toogle = false)
-        {
-            // 2020-12-29, 14:33 by Kai Mayer // get Core.MicEnabled or Core.CurrentCall.MicrophoneMuted not working
-            if (call != null && call.State == CallState.StreamsRunning)
-            {
-                micMutedState = toogle ? !MicrophoneIsMuted : micMutedState;
-                button.IsEnabled = true;
-                button.BackgroundColor = micMutedState ? Color.FromHex(red) : Color.FromHex(green);  // #f51414 = Rot #15ad17 = Gruen
-                button.Source = micMutedState ? ImageSource.FromFile("micmuted.png") : ImageSource.FromFile("mic.png");
-                button.Aspect = Aspect.AspectFill;
-                Global.Core.MicEnabled = !micMutedState;
-                MicrophoneIsMuted = micMutedState;
-            }
-            else
-            {
-                Global.Core.MicEnabled = false;
-                MicrophoneIsMuted = true;
-                button.IsEnabled = false;
-                button.BackgroundColor = Color.FromHex(grey);
-                button.Source = ImageSource.FromFile("micmuted.png");
-            }
-        }
 
-        private void InterpreteCallButtonState(ImageButton button, Call call, string invite = null, bool hangoff = false)
-        {
-            Color color;
-            CallParams callParams = Global.Core.CreateCallParams(null);
-            callParams.VideoEnabled = true;
-
-            if (call != null)
-            {
-                //call.CameraEnabled = false;
-                color = Color.FromHex(red);
-                //color = ((call.State == CallState.Released) || (call.State == CallState.End)) ? Color.FromHex(green) : Color.FromHex(red);
-                if (call.State == CallState.Released || call.State == CallState.End)
-                {
-                    color = Color.FromHex(green);
-                }
-                if (hangoff)
-                {
-                    Global.Core.TerminateAllCalls();
-                    color = Color.FromHex(green);
-                }
-                if (call.State == CallState.IncomingReceived) call.AcceptWithParams(callParams); //  Core.AcceptCallWithParams(call, CallParams);
-            }
-            else
-            {
-                color = Color.FromHex(green);
-                if (invite != null) Global.Core.InviteWithParams(invite, callParams); // 2020-12-29, 16:30 by Kai Mayer // sip:Sven@mayer-schoch.ddns.net:5061"
-            }
-            button.BackgroundColor = color;
-        }
-        private async void BtnSettings_Clicked(object sender, EventArgs e)
-        {
-            await Navigation.PushAsync(new Pages.Menue());
-            //await Navigation.PushAsync(new Pages.Settings.Menue());
-            //await Navigation.PushAsync(new Pages.Settings());
-        }
-
-        private void BtnCall_Clicked(object sender, EventArgs e)
-        {
-            if(Global.User.Count > 0)
-            {
-                string number = "sip:" + (string)Global.User["doorunit"] + "@" + (string)Global.User["sip"]["domain"] + ":" + (string)Global.User["sip"]["port"];
-                InterpreteCallButtonState(BtnCall, Global.Core.CurrentCall, number, true);
-            }
-            //string number = "sip:" + dieklingel.Settings.Sip.DoorunitUsername.Value + "@" + dieklingel.Settings.Sip.Domain.Value + ":" + dieklingel.Settings.Sip.Port.Value;
-        }
-
-        private void BtnMute_Clicked(object sender, EventArgs e)
-        {
-            SetMicMutedState((ImageButton)sender, Global.Core.CurrentCall, false, true);
-        }
-
-        private async void BtnDoorUnlock_Clicked(object sender, EventArgs e)
-        {
-            if(Global.User.Count > 0)
-            {
-                JObject res = Socket.Send(Socket.Context.Unlock, new JObject());
-                if ((int)res["status_code"] == 200)
-                {
-                    // Unlock animation
-                    ViewExtensions.CancelAnimations(lock_top);
-                    ViewExtensions.CancelAnimations(lock_);
-
-                    lock_.IsVisible = true;
-                    await lock_.FadeTo(1, 300);
-
-                    await lock_top.TranslateTo(0, -30, 200);
-              
-                    await lock_.FadeTo(0, 300);
-                    _ = lock_top.TranslateTo(0, 0, 0);
-                    lock_.IsVisible = false;
-                }
-            }
-            else
-            {
-                await Navigation.PushAsync(new Pages.Account());
-            }
-            
-        }
-
-        private void BtnHideControls_Clicked(object sender, EventArgs e)
-        {
-            if(CallIsActive)
-            {
-                HideMainControls(!MainControlsHidden);
-            }
-        }
-
-        private async void HideMainControls(bool hide=true)
+        private async void SetMainControlsVisibile(bool visible=true)
         {
             ViewExtensions.CancelAnimations(FlMainControls);
             ViewExtensions.CancelAnimations(FrBtnSettings);
-            MainControlsHidden = hide;
-            if (hide)
+            mainControlsVisible = visible;
+            if (visible)
             {
-                _ = FrBtnSettings.TranslateTo(100, 0, 200);
-                await FlMainControls.TranslateTo(0, 200, 200);
-            }else
-            {
+                // move controls in to viewport area
                 _ = FrBtnSettings.TranslateTo(0, 0, 200);
                 await FlMainControls.TranslateTo(0, 0, 200);
+            }
+            else
+            {
+                // move controls out of viewport area
+                _ = FrBtnSettings.TranslateTo(100, 0, 200);
+                await FlMainControls.TranslateTo(0, 200, 200);
             }
             
         }
 
-        private void BtnSpeaker_Clicked(object sender, EventArgs e)
+        /**
+         * toogle the mic between on and off;
+         */
+        private void ToogleMic()
         {
-            ToogleSpeaker();
-        }
-
-        private void ToogleSpeaker()
-        {
-            //SpeakerIsEnabled = !SpeakerIsEnabled;
-            if(SpeakerIsEnabled)
+            if(micEnabled)
             {
-                SpeakerIsEnabled = !dieKlingel.Audio.Controller.TurnSpeakerOff();
+                // 2021-11-12 15:56 Kai Mayer - get the current state from Core.MicEnabled does not work, it always returns true. 
+                micEnabled = false;
+                BtnMute.BackgroundColor = Color.FromHex(COLOR_RED_HEX);
+                BtnMute.Source = ImageSource.FromFile("micmuted.png");
             }else
             {
-                SpeakerIsEnabled = dieKlingel.Audio.Controller.TurnSpeakerOn();
+                micEnabled = true;
+                BtnMute.BackgroundColor = Color.FromHex(COLOR_GREEN_HEX);
+                BtnMute.Source = ImageSource.FromFile("mic.png");
             }
-            BtnSpeaker.Source = SpeakerIsEnabled ? ImageSource.FromFile("speaker.png") : ImageSource.FromFile("speakersilent.png");
+        }
+
+        /**
+         * toogle the speaker between ear and speaker
+         */
+        private void ToogleSpeaker()
+        {
+            if(dieKlingel.Controller.Audio.SpeakerState == dieKlingel.Controller.Audio.SpeakerMode.OnEar)
+            {
+                dieKlingel.Controller.Audio.TurnSpeakerOn();
+                // BtnSpeaker could be null, if removed before when the app is not be running on a phone
+                if(null != BtnSpeaker)
+                {
+                    BtnSpeaker.Source = ImageSource.FromFile("speaker.png");
+                }
+            }else
+            {
+                dieKlingel.Controller.Audio.TurnSpeakerOff();
+                if (null != BtnSpeaker)
+                {
+                    BtnSpeaker.Source = ImageSource.FromFile("speakersilent.png");
+                }
+            }
+        }
+
+        /**
+         * plays the animation of the lock
+         */
+        private async void PlayUnlockAnimation()
+        {
+            ViewExtensions.CancelAnimations(lock_top);
+            ViewExtensions.CancelAnimations(lock_);
+
+            lock_.IsVisible = true;
+            await lock_.FadeTo(1, 300);
+            await lock_top.TranslateTo(0, -30, 200);
+            await lock_.FadeTo(0, 300);
+            _ = lock_top.TranslateTo(0, 0, 0);
+            lock_.IsVisible = false;
         }
     }
 }

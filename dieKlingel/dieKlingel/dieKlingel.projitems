@@ -13,6 +13,7 @@
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)MainPage.xaml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Account.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
@@ -38,7 +39,13 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Cryptonia.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Doorunit.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dup\Dup.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dup\Context.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dup\Notification.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Dup\Response.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Global.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IntentContent.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LinphoneManager.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LinphoneWrapper.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)MainPage.xaml.cs">
@@ -60,11 +67,14 @@
       <DependentUpon>Menue.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="$(MSBuildThisFileDirectory)Pages\Preview.xaml.cs">
+      <DependentUpon>Preview.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="$(MSBuildThisFileDirectory)Pages\RemoteEditor.xaml.cs">
       <DependentUpon>RemoteEditor.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="$(MSBuildThisFileDirectory)Socket.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="$(MSBuildThisFileDirectory)Pages\Menue.xaml">
@@ -118,5 +128,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Pages\Preview.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="$(MSBuildThisFileDirectory)Dup\" />
   </ItemGroup>
 </Project>
